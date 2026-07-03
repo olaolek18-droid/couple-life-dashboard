@@ -20,7 +20,7 @@ import fs from "fs";
 const distPath = path.resolve(import.meta.dirname, "..", "dist", "public");
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
-  app.use("*", (_req, res) => res.sendFile(path.resolve(distPath, "index.html")));
+  app.use("*", (_req: any, res: any) => res.sendFile(path.resolve(distPath, "index.html")));
 }
 
 export default app;
