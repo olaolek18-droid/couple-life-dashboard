@@ -4,6 +4,8 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { getDb, getOrCreateCouple, getCoupleByUserId, getMonthlyExpenses, getTotalSavings, updateCoupleHappiness, getShoppingList, getDailyTasks, getRecipes, getCalendarEvents, getReceipts, getWorkSchedules, getUserNotifications } from "./db";
 import { z } from "zod";
+import * as schema from "../drizzle/schema";
+import { eq } from "drizzle-orm";
 
 export const appRouter = router({
   system: systemRouter,
@@ -65,7 +67,7 @@ export const appRouter = router({
         if (!couple) throw new Error("Couple not found");
 
         // Insert expense
-        await db.insert(require("../drizzle/schema").expenses).values({
+        await db.insert(schema.expenses).values({
           coupleId: couple.id,
           userId: ctx.user.id,
           category: input.category,
@@ -119,7 +121,7 @@ export const appRouter = router({
         const couple = await getCoupleByUserId(ctx.user.id);
         if (!couple) throw new Error("Couple not found");
 
-        await db.insert(require("../drizzle/schema").shoppingListItems).values({
+        await db.insert(schema.shoppingListItems).values({
           coupleId: couple.id,
           item: input.item,
           quantity: input.quantity,
@@ -137,9 +139,9 @@ export const appRouter = router({
         const db = await getDb();
         if (!db) throw new Error("Database not available");
 
-        await db.update(require("../drizzle/schema").shoppingListItems)
+        await db.update(schema.shoppingListItems)
           .set({ completed: input.completed })
-          .where(require("drizzle-orm").eq(require("../drizzle/schema").shoppingListItems.id, input.itemId));
+          .where(eq(schema.shoppingListItems.id, input.itemId));
 
         return { success: true };
       }),
@@ -169,7 +171,7 @@ export const appRouter = router({
         const couple = await getCoupleByUserId(ctx.user.id);
         if (!couple) throw new Error("Couple not found");
 
-        await db.insert(require("../drizzle/schema").dailyTasks).values({
+        await db.insert(schema.dailyTasks).values({
           coupleId: couple.id,
           title: input.title,
           description: input.description,
@@ -188,9 +190,9 @@ export const appRouter = router({
         const db = await getDb();
         if (!db) throw new Error("Database not available");
 
-        await db.update(require("../drizzle/schema").dailyTasks)
+        await db.update(schema.dailyTasks)
           .set({ completed: input.completed })
-          .where(require("drizzle-orm").eq(require("../drizzle/schema").dailyTasks.id, input.taskId));
+          .where(eq(schema.dailyTasks.id, input.taskId));
 
         return { success: true };
       }),
@@ -222,7 +224,7 @@ export const appRouter = router({
         const couple = await getCoupleByUserId(ctx.user.id);
         if (!couple) throw new Error("Couple not found");
 
-        await db.insert(require("../drizzle/schema").recipes).values({
+        await db.insert(schema.recipes).values({
           coupleId: couple.id,
           title: input.title,
           description: input.description,
@@ -243,9 +245,9 @@ export const appRouter = router({
         const db = await getDb();
         if (!db) throw new Error("Database not available");
 
-        await db.update(require("../drizzle/schema").recipes)
+        await db.update(schema.recipes)
           .set({ isFavorite: input.isFavorite })
-          .where(require("drizzle-orm").eq(require("../drizzle/schema").recipes.id, input.recipeId));
+          .where(eq(schema.recipes.id, input.recipeId));
 
         return { success: true };
       }),
@@ -276,7 +278,7 @@ export const appRouter = router({
         const couple = await getCoupleByUserId(ctx.user.id);
         if (!couple) throw new Error("Couple not found");
 
-        await db.insert(require("../drizzle/schema").calendarEvents).values({
+        await db.insert(schema.calendarEvents).values({
           coupleId: couple.id,
           title: input.title,
           description: input.description,
@@ -316,7 +318,7 @@ export const appRouter = router({
         const couple = await getCoupleByUserId(ctx.user.id);
         if (!couple) throw new Error("Couple not found");
 
-        await db.insert(require("../drizzle/schema").receipts).values({
+        await db.insert(schema.receipts).values({
           coupleId: couple.id,
           store: input.store,
           photoUrl: input.photoUrl,
